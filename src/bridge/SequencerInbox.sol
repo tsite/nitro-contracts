@@ -21,7 +21,7 @@ import {
     AlreadyValidDASKeyset,
     NoSuchKeyset,
     NotForked,
-    Paused	
+    Paused
 } from "../libraries/Error.sol";
 import "./IBridge.sol";
 import "./IInbox.sol";
@@ -480,7 +480,7 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
         }
         emit SequencerBatchData(seqMessageIndex, data);
     }
-	
+
     function inboxAccs(uint256 index) external view returns (bytes32) {
         return bridge.sequencerInboxAccs(index);
     }

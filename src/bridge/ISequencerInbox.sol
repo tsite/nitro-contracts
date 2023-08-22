@@ -144,7 +144,7 @@ interface ISequencerInbox is IDelayedMessageProvider {
         uint256 prevMessageCount,
         uint256 newMessageCount
     ) external;
-	
+
     // ---------- onlyRollupOrOwner functions ----------
 
     /**
