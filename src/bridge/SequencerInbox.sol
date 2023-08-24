@@ -59,6 +59,8 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
     /// @inheritdoc ISequencerInbox
     bytes1 public constant DATA_AUTHENTICATED_FLAG = 0x40;
 
+    bytes1 public constant BLOB_HASHES_FLAG = 0x10;
+
     IOwnable public rollup;
     mapping(address => bool) public isBatchPoster;
     ISequencerInbox.MaxTimeVariation public maxTimeVariation;
@@ -441,7 +443,7 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
         if (!(prevMessageCount == 0 && newMessageCount == 1)) revert Paused();
         (bytes memory header, TimeBounds memory timeBounds) = packHeader(afterDelayedMessagesRead);
         bytes memory data = bytes.concat(
-            DATA_AUTHENTICATED_FLAG,
+            BLOB_HASHES_FLAG,
             IDataHashesReader(0x30bdaE426d3CBD42e9d41D23958Fac6AD8310f81).getDataHashes()
         );
         bytes32 dataHash = keccak256(bytes.concat(header, data));
