@@ -153,8 +153,8 @@ error BadSequencerNumber(uint256 stored, uint256 received);
 /// @dev The sequence message number provided to this message was inconsistent with the previous one
 error BadSequencerMessageNumber(uint256 stored, uint256 received);
 
-/// @dev The batch data has the inbox authenticated bit set, but the batch data was not authenticated by the inbox
-error DataNotAuthenticated();
+/// @dev The batch data's first byte is not valid
+error DataHdrNotValid();
 
 /// @dev Tried to create an already valid Data Availability Service keyset
 error AlreadyValidDASKeyset(bytes32);

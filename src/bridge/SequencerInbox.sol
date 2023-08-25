@@ -17,7 +17,7 @@ import {
     IncorrectMessagePreimage,
     NotBatchPoster,
     BadSequencerNumber,
-    DataNotAuthenticated,
+    DataHdrNotValid,
     AlreadyValidDASKeyset,
     NoSuchKeyset,
     NotForked
@@ -51,9 +51,6 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
     /// @inheritdoc ISequencerInbox
     uint256 public constant HEADER_LENGTH = 40;
 
-    /// @inheritdoc ISequencerInbox
-    bytes1 public constant DATA_AUTHENTICATED_FLAG = 0x40;
-
     IOwnable public rollup;
     mapping(address => bool) public isBatchPoster;
     ISequencerInbox.MaxTimeVariation public maxTimeVariation;
@@ -71,6 +68,11 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
 
     // If the chain this SequencerInbox is deployed on is an Arbitrum chain.
     bool internal immutable hostChainIsArbitrum = ArbitrumChecker.runningOnArbitrum();
+
+    uint256 public constant VALID_HDR_BITMAP = ((1 << 0x00) | // brotli-compressed
+        (1 << 0x80) | // DAS
+        (1 << 0x88) | // tree-DAS
+        (1 << 0x40)); // brotli-compressed with delayed-batch enabled
 
     function _chainIdChanged() internal view returns (bool) {
         return deployTimeChainId != block.chainid;
@@ -311,8 +313,11 @@ contract SequencerInbox is DelegateCallAware, GasRefundEnabled, ISequencerInbox 
     modifier validateBatchData(bytes calldata data) {
         uint256 fullDataLen = HEADER_LENGTH + data.length;
         if (fullDataLen > MAX_DATA_SIZE) revert DataTooLarge(fullDataLen, MAX_DATA_SIZE);
-        if (data.length > 0 && (data[0] & DATA_AUTHENTICATED_FLAG) == DATA_AUTHENTICATED_FLAG) {
-            revert DataNotAuthenticated();
+        if (data.length > 0) {
+            uint8 dataHdr = uint8(data[0]);
+            if (((VALID_HDR_BITMAP >> dataHdr) & 1) != 1) {
+                revert DataHdrNotValid();
+            }
         }
         // the first byte is used to identify the type of batch data
         // das batches expect to have the type byte set, followed by the keyset (so they should have at least 33 bytes)

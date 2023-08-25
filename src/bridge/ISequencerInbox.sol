@@ -60,11 +60,6 @@ interface ISequencerInbox is IDelayedMessageProvider {
     // solhint-disable-next-line func-name-mixedcase
     function HEADER_LENGTH() external view returns (uint256);
 
-    /// @dev If the first batch data byte after the header has this bit set,
-    ///      the sequencer inbox has authenticated the data. Currently not used.
-    // solhint-disable-next-line func-name-mixedcase
-    function DATA_AUTHENTICATED_FLAG() external view returns (bytes1);
-
     function rollup() external view returns (IOwnable);
 
     function isBatchPoster(address) external view returns (bool);
