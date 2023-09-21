@@ -51,4 +51,8 @@ contract SequencerInboxStub is SequencerInbox {
         this; // silence warning about function not being view
         return bounds;
     }
+
+    function setIsBatchPosterWithoutOwner(address addr, bool isBatchPoster_) external {
+        isBatchPoster[addr] = isBatchPoster_;
+    }
 }
